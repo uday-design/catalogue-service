@@ -67,7 +67,7 @@ public class TheatreControllerTest extends BaseTestCase {
 
     @Test
     public void testSaveTheatre() {
-        Mockito.when(theatreService.saveTheatre(Mockito.any(Theatre.class))).thenReturn(TestUtil.getTheatre());
+        Mockito.when(theatreService.saveTheatre(Mockito.any(SaveTheatreDTO.class), Mockito.anyInt())).thenReturn(TestUtil.getTheatre());
         Mockito.when(theatreMapper.theatreToTheatreDTO(Mockito.any(Theatre.class))).thenReturn(TestUtil.getTheatreDTO());
         Mockito.when(saveTheatreMapper.saveTheatreDTOToTheatre(Mockito.any(SaveTheatreDTO.class), Mockito.anyInt())).thenReturn(TestUtil.getTheatre());
 
@@ -82,7 +82,7 @@ public class TheatreControllerTest extends BaseTestCase {
     @Test
     public void testDeleteTheatre() {
         Mockito.when(theatreService.getTheatre(Mockito.anyInt())).thenReturn(TestUtil.getTheatre());
-        Mockito.doNothing().when(theatreService).deleteTheatre(Mockito.any(Theatre.class));
+        Mockito.doNothing().when(theatreService).deleteTheatre(Mockito.anyInt());
 
         ResponseEntity<ResponseDTO<Object>> response = theatreController.deleteTheatre(1);
 
@@ -94,7 +94,7 @@ public class TheatreControllerTest extends BaseTestCase {
     @Test
     public void testLoadMovies() {
         Mockito.when(theatreService.getTheatre(Mockito.anyInt())).thenReturn(TestUtil.getTheatre());
-        Mockito.doNothing().when(theatreService).loadMoviesInTheatre(Mockito.any(Theatre.class));
+        Mockito.doNothing().when(theatreService).loadMoviesInTheatre(Mockito.anyInt());
 
         ResponseEntity<ResponseDTO<Object>> response = theatreController.loadMovies(1);
 

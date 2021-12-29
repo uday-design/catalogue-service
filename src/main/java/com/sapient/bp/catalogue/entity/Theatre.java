@@ -25,10 +25,4 @@ public class Theatre {
     @ManyToOne
     @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
-
-    @Column(name = "movie_api")
-    private String movieAPI;
-
-    @Column(name = "movie_details_api")
-    private String movieDetailsAPI;
 }

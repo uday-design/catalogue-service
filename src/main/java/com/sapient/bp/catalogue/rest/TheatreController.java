@@ -58,19 +58,19 @@ public class TheatreController {
 
     @PostMapping("/city/{cityId}")
     public ResponseEntity<ResponseDTO<TheatreDTO>> saveTheatre(@RequestBody SaveTheatreDTO theatre, @PathVariable Integer cityId) {
-        TheatreDTO theatreDTO = theatreMapper.theatreToTheatreDTO(theatreService.saveTheatre(saveTheatreMapper.saveTheatreDTOToTheatre(theatre, cityId)));
+        TheatreDTO theatreDTO = theatreMapper.theatreToTheatreDTO(theatreService.saveTheatre(theatre, cityId));
         return ResponseEntity.ok(ResponseDTO.<TheatreDTO>builder().result(theatreDTO).status(ResponseStatusEnum.SUCCESS).build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDTO<Object>> deleteTheatre(@PathVariable Integer theatreId) {
-        theatreService.deleteTheatre(theatreService.getTheatre(theatreId));
+        theatreService.deleteTheatre(theatreId);
         return ResponseEntity.ok(ResponseDTO.builder().result(null).status(ResponseStatusEnum.SUCCESS).build());
     }
 
     @PostMapping("/{theatreId}/load-movies")
     public ResponseEntity<ResponseDTO<Object>> loadMovies(@PathVariable Integer theatreId) {
-        theatreService.loadMoviesInTheatre(theatreService.getTheatre(theatreId));
+        theatreService.loadMoviesInTheatre(theatreId);
         return ResponseEntity.ok(ResponseDTO.builder().result(null).status(ResponseStatusEnum.SUCCESS).build());
     }
 }

@@ -1,7 +1,6 @@
 package com.sapient.bp.catalogue.service;
 
 import com.sapient.bp.catalogue.entity.Movie;
-import com.sapient.bp.catalogue.entity.Theatre;
 import com.sapient.bp.catalogue.exception.SystemException;
 import com.sapient.bp.catalogue.repository.MovieRepository;
 import com.sapient.bp.catalogue.util.BaseTestCase;
@@ -70,7 +69,7 @@ public class MovieServiceTest extends BaseTestCase {
     @Test
     public void testGetAllMoviesInCity() {
         Mockito.when(theatreService.getTheatreByCity(Mockito.anyInt())).thenReturn(Collections.singletonList(TestUtil.getTheatre()));
-        Mockito.when(theatreService.getMoviesInTheatre(Mockito.any(Theatre.class))).thenReturn(Collections.singletonList(TestUtil.getMovie()));
+        Mockito.when(theatreService.getMoviesInTheatre(Mockito.anyInt())).thenReturn(Collections.singletonList(TestUtil.getMovie()));
 
         Set<Movie> movies = movieService.getAllMoviesInCity(1);
 

@@ -10,8 +10,6 @@ public interface SaveTheatreMapper {
 
     @Mapping(source = "saveTheatreDTO.id", target = "id")
     @Mapping(source = "saveTheatreDTO.name", target = "name")
-    @Mapping(source = "saveTheatreDTO.movieAPI", target = "movieAPI")
-    @Mapping(source = "saveTheatreDTO.movieDetailsAPI", target = "movieDetailsAPI")
     @Mapping(source = "cityId", target = "city")
     Theatre saveTheatreDTOToTheatre(SaveTheatreDTO saveTheatreDTO, Integer cityId);
 }

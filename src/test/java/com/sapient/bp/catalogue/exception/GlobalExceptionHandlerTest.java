@@ -3,7 +3,6 @@ package com.sapient.bp.catalogue.exception;
 import com.sapient.bp.catalogue.dto.ResponseDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
@@ -18,6 +17,6 @@ public class GlobalExceptionHandlerTest {
 
         ResponseEntity<Object> response = handler.handleConflict(new SystemException("Test Exception"), webRequest);
 
-        Assertions.assertEquals("500", ((ResponseDTO<Object>)response.getBody()).getError().getCode());
+        Assertions.assertEquals("500", ((ResponseDTO<Object>) response.getBody()).getError().getCode());
     }
 }

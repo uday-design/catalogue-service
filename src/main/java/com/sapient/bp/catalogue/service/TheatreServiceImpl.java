@@ -1,21 +1,22 @@
 package com.sapient.bp.catalogue.service;
 
-import com.sapient.bp.catalogue.dto.MovieDTO;
+import com.sapient.bp.catalogue.dto.MovieInTheatreDTO;
+import com.sapient.bp.catalogue.dto.SaveTheatreDTO;
 import com.sapient.bp.catalogue.entity.City;
 import com.sapient.bp.catalogue.entity.Movie;
 import com.sapient.bp.catalogue.entity.MovieTheatre;
 import com.sapient.bp.catalogue.entity.Theatre;
 import com.sapient.bp.catalogue.exception.SystemException;
+import com.sapient.bp.catalogue.mapper.SaveTheatreMapper;
 import com.sapient.bp.catalogue.repository.MovieTheatreRepository;
 import com.sapient.bp.catalogue.repository.TheatreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,13 @@ public class TheatreServiceImpl implements TheatreService {
     private MovieTheatreRepository movieTheatreRepository;
 
     @Autowired
+    private TheatreAdapter theatreAdapter;
+
+    @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private SaveTheatreMapper saveTheatreMapper;
 
     @Override
     public List<Theatre> getTheatreByCity(Integer cityId) {
@@ -44,38 +51,15 @@ public class TheatreServiceImpl implements TheatreService {
     }
 
     @Override
-    public Theatre saveTheatre(Theatre theatre) {
-        return theatreRepository.save(theatre);
+    public Theatre saveTheatre(SaveTheatreDTO saveTheatreDTO, Integer cityId) {
+        theatreAdapter.saveTheatreAdapterConfig(saveTheatreDTO);
+        return theatreRepository.save(saveTheatreMapper.saveTheatreDTOToTheatre(saveTheatreDTO, cityId));
     }
 
     @Override
-    public void deleteTheatre(Theatre theatre) {
-        theatreRepository.delete(theatre);
-    }
-
-    @Transactional
-    @Override
-    public void loadMoviesInTheatre(Theatre theatre) {
-        String moviesURL = theatre.getMovieAPI();
-        try {
-            MovieDTO[] movies = restTemplate.getForObject(moviesURL, MovieDTO[].class);
-            movieTheatreRepository.deleteAllByTheatre(theatre);
-            Arrays.stream(movies).forEach(m -> {
-                Movie movie = movieService.getMovieByName(m.getName());
-                if (movie == null) {
-                    Movie newMovie = new Movie();
-                    newMovie.setName(m.getName());
-                    movie = movieService.saveMovie(newMovie);
-                }
-                MovieTheatre movieTheatre = new MovieTheatre();
-                movieTheatre.setTheatre(theatre);
-                movieTheatre.setMovie(movie);
-                movieTheatreRepository.save(movieTheatre);
-            });
-        } catch (RestClientException e) {
-            log.error("Unable to get movies using url " + moviesURL, e);
-            throw new SystemException("Unable to get movies using url " + moviesURL, e);
-        }
+    public void deleteTheatre(Integer theatreId) {
+        theatreAdapter.deleteTheatreAdapterConfig(theatreId);
+        theatreRepository.delete(getTheatre(theatreId));
     }
 
     @Override
@@ -91,7 +75,29 @@ public class TheatreServiceImpl implements TheatreService {
     }
 
     @Override
-    public List<Movie> getMoviesInTheatre(Theatre theatre) {
-        return movieTheatreRepository.findAllByTheatre(theatre).stream().map(MovieTheatre::getMovie).collect(Collectors.toList());
+    public List<Movie> getMoviesInTheatre(Integer theatreId) {
+        return movieTheatreRepository.findAllByTheatre(getTheatre(theatreId)).stream().map(MovieTheatre::getMovie).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public void loadMoviesInTheatre(Integer theatreId) {
+        Theatre theatre = getTheatre(theatreId);
+        MovieInTheatreDTO movieInTheatreDTO = theatreAdapter.loadMovies(theatreId);
+        List<MovieTheatre> movieInTheatres = new ArrayList<>();
+        movieInTheatreDTO.getMovies().forEach(movie -> {
+            Movie m = movieService.getMovieByName(movie.getName());
+            if (m == null) {
+                Movie newMovie = new Movie();
+                newMovie.setName(movie.getName());
+                m = movieService.saveMovie(newMovie);
+            }
+            MovieTheatre movieTheatre = new MovieTheatre();
+            movieTheatre.setTheatre(theatre);
+            movieTheatre.setMovie(m);
+            movieInTheatres.add(movieTheatre);
+        });
+        movieTheatreRepository.deleteAllByTheatre(theatre);
+        movieTheatreRepository.saveAll(movieInTheatres);
     }
 }

@@ -30,7 +30,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Set<Movie> getAllMoviesInCity(Integer cityId) {
-        return theatreService.getTheatreByCity(cityId).stream().flatMap(t -> theatreService.getMoviesInTheatre(t).stream()).collect(Collectors.toSet());
+        return theatreService.getTheatreByCity(cityId).stream().flatMap(t -> theatreService.getMoviesInTheatre(t.getId()).stream()).collect(Collectors.toSet());
     }
 
     @Override
